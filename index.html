@@ -22,15 +22,37 @@
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
     var socket = io();
+    var username = null;
     $('form').submit(function(){
-        socket.emit('chat message', $('#m').val());
-        $('#m').val('')
-        return false;
+      
+      var message = $('#m').val();
+      var regExp = /^\/nickname/;
+      
+      if(message.match(regExp)){
+        var oldUsername = username;
+        username = message.replace(regExp,'').trim();
+        socket.emit('chat message','System',oldUsername+' is now '+username);
+      }else{
+        socket.emit('chat message', username, $('#m').val());
+      }
+      $('#m').val('');
+      return false;
     });
 
-    socket.on('chat message', function(msg){
-        $('#messages').append($('<li>').text(msg));
+    function appendMessage(username, msg){
+      $('#messages').append($('<li>').text(username+': '+msg));
+    }
+
+    socket.on('username',function(newUsername){
+      username = newUsername;
+      appendMessage('System',newUsername+' has connected');
     });
+
+    socket.on('chat message', function(username, msg){
+        appendMessage(username, msg);
+    });
+
+
     </script>
   </body>
 </html>
