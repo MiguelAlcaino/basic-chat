@@ -23,6 +23,11 @@
     <script>
     var socket = io();
     var username = null;
+
+    function appendMessage(username, msg){
+      $('#messages').append($('<li>').text(username+': '+msg));
+    }
+
     $('form').submit(function(){
       
       var message = $('#m').val();
@@ -31,17 +36,16 @@
       if(message.match(regExp)){
         var oldUsername = username;
         username = message.replace(regExp,'').trim();
-        socket.emit('chat message','System',oldUsername+' is now '+username);
+        message = oldUsername+' is now '+username;
+        socket.emit('system message', message);
+        delete oldUsername;
       }else{
-        socket.emit('chat message', username, $('#m').val());
+        socket.emit('chat message', username, message);
+        appendMessage(username, message );
       }
       $('#m').val('');
       return false;
     });
-
-    function appendMessage(username, msg){
-      $('#messages').append($('<li>').text(username+': '+msg));
-    }
 
     socket.on('username',function(newUsername){
       username = newUsername;
@@ -50,6 +54,11 @@
 
     socket.on('chat message', function(username, msg){
         appendMessage(username, msg);
+        console.log('receiving message from'+username+': '+msg);
+    });
+
+    socket.on('system message', function(message){
+      appendMessage('System',message);
     });
 
 

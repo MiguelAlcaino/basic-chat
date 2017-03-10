@@ -15,8 +15,12 @@ io.on('connection', function(socket){
         numberOfActiveConnections--;
     });
 
-    socket.on('chat message', function(username,msg){
-        io.emit('chat message', username, msg);
+    socket.on('chat message', function(username,message){
+        socket.broadcast.emit('chat message', username, message);
+    });
+
+    socket.on('system message', function(message){
+        io.emit('system message', message);
     });
 });
 
