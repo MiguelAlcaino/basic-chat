@@ -22,6 +22,14 @@ io.on('connection', function(socket){
     socket.on('system message', function(message){
         io.emit('system message', message);
     });
+
+    socket.on('typing', function(isTyping){
+        if(isTyping){
+            console.log('The user is typing');
+        }else{
+            console.log('The user stopped typing');
+        }
+    });
 });
 
 http.listen(3000, function(){
